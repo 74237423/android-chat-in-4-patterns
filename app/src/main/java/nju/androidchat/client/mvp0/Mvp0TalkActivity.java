@@ -7,7 +7,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +20,7 @@ import nju.androidchat.client.ClientMessage;
 import nju.androidchat.client.R;
 import nju.androidchat.client.Utils;
 import nju.androidchat.client.component.ItemTextReceive;
+import nju.androidchat.client.component.ItemTextReceive2;
 import nju.androidchat.client.component.ItemTextSend;
 import nju.androidchat.client.component.OnRecallMessageRequested;
 
@@ -48,6 +48,7 @@ public class Mvp0TalkActivity extends AppCompatActivity implements Mvp0Contract.
 
     @Override
     public void showMessageList(List<ClientMessage> messages) {
+        System.out.println("gengxin UI");
         runOnUiThread(() -> {
                     LinearLayout content = findViewById(R.id.chat_content);
 
@@ -57,11 +58,25 @@ public class Mvp0TalkActivity extends AppCompatActivity implements Mvp0Contract.
                     // 增加ItemText
                     for (ClientMessage message : messages) {
                         String text = String.format("%s", message.getMessage());
+                        System.out.println(text);
                         // 如果是自己发的，增加ItemTextSend
                         if (message.getSenderUsername().equals(this.presenter.getUsername())) {
                             content.addView(new ItemTextSend(this, text, message.getMessageId(), this));
                         } else {
-                            content.addView(new ItemTextReceive(this, text, message.getMessageId()));
+                            System.out.println("收到别人的消息"+message.getMessage());
+                            String cont = message.getMessage();
+                            if(!cont.startsWith("![]{")) {
+                                System.out.println("不是图片");
+                                content.addView(new ItemTextReceive(this, text, message.getMessageId()));
+                            }
+                            else{
+                                int index1 = cont.indexOf("{");
+                                int index2 = cont.indexOf("}");
+                                String name = cont.substring(index1+1,index2);
+                                System.out.println("图片的名字"+name);
+                                content.addView(new ItemTextReceive2(this, name, message.getMessageId()));
+                            }
+
                         }
                     }
 
